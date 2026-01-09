@@ -1,0 +1,69 @@
+{
+  "chat": {
+    "tawkTo": {
+      "enabled": true,
+      "propertyId": "68dd96608a87051952400fcd",
+      "widgetId": "1j6gp6r39",
+      "customization": {
+        "hideOnMobile": false,
+        "customGreeting": true,
+        "position": "bottom-left",
+        "theme": {
+          "primaryColor": "#16a085",
+          "secondaryColor": "#2ecc71"
+        }
+      }
+    },
+    "whatsapp": {
+      "enabled": true,
+      "phoneNumber": "12058665269",
+      "defaultMessage": "Hi! I'm interested in your academic support services. Can you help me?",
+      "businessHours": {
+        "enabled": true,
+        "timezone": "EST",
+        "hours": {
+          "monday": { "start": "08:00", "end": "22:00" },
+          "tuesday": { "start": "08:00", "end": "22:00" },
+          "wednesday": { "start": "08:00", "end": "22:00" },
+          "thursday": { "start": "08:00", "end": "22:00" },
+          "friday": { "start": "08:00", "end": "22:00" },
+          "saturday": { "start": "10:00", "end": "20:00" },
+          "sunday": { "start": "10:00", "end": "20:00" }
+        }
+      }
+    },
+    "general": {
+      "showBothOptions": true,
+      "defaultOption": "whatsapp",
+      "showOnlineStatus": true,
+      "enableNotifications": true,
+      "autoHideDelay": 5000
+    }
+  },
+  "contact": {
+    "email": "support@nursepro.com",
+    "phone": "+1 (205) 866-5269",
+    "address": {
+      "street": "",
+      "city": "",
+      "state": "",
+      "zip": "",
+      "country": "USA"
+    },
+    "socialMedia": {
+      "facebook": "",
+      "twitter": "",
+      "instagram": "",
+      "linkedin": ""
+    }
+  },
+  "support": {
+    "responseTime": {
+      "whatsapp": "Instant - 15 minutes",
+      "email": "1-2 hours",
+      "phone": "Available during business hours",
+      "liveChat": "Real-time"
+    },
+    "availability": "24/7 WhatsApp support, Live chat during business hours"
+  }
+}
