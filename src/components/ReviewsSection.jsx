@@ -158,7 +158,7 @@ const ReviewsSection = () => {
       {/* Submit Review Form */}
       <div className="submit-review">
         <h3>📝 Write a Review</h3>
-        <form onSubmit={handleSubmitReview}>
+        <form id="reviewForm" onSubmit={handleSubmitReview}>
           <input
             type="text"
             placeholder="Your name (optional)"
