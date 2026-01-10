@@ -14,6 +14,7 @@ import ContactSection from './components/ContactSection'
 import Footer from './components/Footer'
 import ChatControls from './components/ChatControls'
 import TawkTo from './components/TawkTo'
+import WhatsAppFloat from './components/WhatsAppFloat'
 
 function App() {
   // Initialize original JavaScript functionality
@@ -35,6 +36,7 @@ function App() {
       <Footer />
       <ChatControls />
       <TawkTo />
+      <WhatsAppFloat />
     </div>
   )
 }
