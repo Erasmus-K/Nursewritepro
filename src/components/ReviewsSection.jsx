@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { supabase } from '../supabase'
 
 const ReviewsSection = () => {
   const [reviews, setReviews] = useState([])
@@ -7,62 +8,68 @@ const ReviewsSection = () => {
   const [comment, setComment] = useState('')
   const [sortBy, setSortBy] = useState('latest')
   const [searchTerm, setSearchTerm] = useState('')
-
-  // Sample reviews data
-  const sampleReviews = [
-    { id: 1, name: "Sarah Johnson", rating: 5, comment: "Excellent service! They helped me complete my nursing thesis on time.", date: "2025-01-15", approved: true, helpful: 12 },
-    { id: 2, name: "Mike Chen", rating: 4, comment: "Very professional and knowledgeable. Great support for my assignments.", date: "2025-01-14", approved: true, helpful: 8 },
-    { id: 3, name: "Emma Wilson", rating: 5, comment: "Outstanding quality work. Highly recommend for nursing students!", date: "2025-01-13", approved: true, helpful: 15 }
-  ]
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    // Load reviews from localStorage or use sample data
-    const storedReviews = localStorage.getItem('nurseProReviews')
-    if (storedReviews) {
-      setReviews(JSON.parse(storedReviews))
-    } else {
-      setReviews(sampleReviews)
-      localStorage.setItem('nurseProReviews', JSON.stringify(sampleReviews))
-    }
+    fetchReviews()
   }, [])
 
-  const handleSubmitReview = (e) => {
+  const fetchReviews = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('reviews')
+        .select('*')
+        .eq('approved', true)
+        .order('created_at', { ascending: false })
+      
+      if (error) throw error
+      setReviews(data || [])
+    } catch (error) {
+      console.error('Error fetching reviews:', error)
+    }
+  }
+
+  const handleSubmitReview = async (e) => {
     e.preventDefault()
     if (rating > 0 && comment.trim()) {
-      const newReview = {
-        id: Date.now(),
-        name: reviewerName.trim() || 'Anonymous',
-        rating: parseInt(rating),
-        comment: comment.trim(),
-        date: new Date().toISOString().split('T')[0],
-        approved: false,
-        helpful: 0
+      setLoading(true)
+      try {
+        const { error } = await supabase
+          .from('reviews')
+          .insert({
+            name: reviewerName.trim() || 'Anonymous',
+            rating: parseInt(rating),
+            comment: comment.trim(),
+            approved: false,
+            helpful: 0
+          })
+        
+        if (error) throw error
+        
+        // Reset form
+        setReviewerName('')
+        setRating(0)
+        setComment('')
+        
+        alert('Review submitted! It will be published after approval.')
+      } catch (error) {
+        console.error('Error submitting review:', error)
+        alert('Error submitting review. Please try again.')
+      } finally {
+        setLoading(false)
       }
-      
-      const updatedReviews = [...reviews, newReview]
-      setReviews(updatedReviews)
-      localStorage.setItem('nurseProReviews', JSON.stringify(updatedReviews))
-      
-      // Reset form
-      setReviewerName('')
-      setRating(0)
-      setComment('')
-      
-      alert('Review submitted! It will be published after approval.')
     }
   }
 
   const getAverageRating = () => {
-    const approvedReviews = reviews.filter(r => r.approved)
-    if (approvedReviews.length === 0) return 0
-    const sum = approvedReviews.reduce((acc, r) => acc + r.rating, 0)
-    return (sum / approvedReviews.length).toFixed(1)
+    if (reviews.length === 0) return 0
+    const sum = reviews.reduce((acc, r) => acc + r.rating, 0)
+    return (sum / reviews.length).toFixed(1)
   }
 
   const getRatingDistribution = () => {
-    const approved = reviews.filter(r => r.approved)
     const distribution = { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 }
-    approved.forEach(review => {
+    reviews.forEach(review => {
       distribution[review.rating]++
     })
     return distribution
@@ -73,15 +80,14 @@ const ReviewsSection = () => {
   }
 
   const filteredReviews = reviews
-    .filter(r => r.approved)
     .filter(r => searchTerm === '' || 
       r.comment.toLowerCase().includes(searchTerm.toLowerCase()) ||
       r.name.toLowerCase().includes(searchTerm.toLowerCase())
     )
     .sort((a, b) => {
       switch(sortBy) {
-        case 'latest': return new Date(b.date) - new Date(a.date)
-        case 'oldest': return new Date(a.date) - new Date(b.date)
+        case 'latest': return new Date(b.created_at) - new Date(a.created_at)
+        case 'oldest': return new Date(a.created_at) - new Date(b.created_at)
         case 'highest': return b.rating - a.rating
         case 'lowest': return a.rating - b.rating
         case 'helpful': return (b.helpful || 0) - (a.helpful || 0)
@@ -90,7 +96,7 @@ const ReviewsSection = () => {
     })
 
   const distribution = getRatingDistribution()
-  const totalReviews = reviews.filter(r => r.approved).length
+  const totalReviews = reviews.length
 
   return (
     <section className="reviews-section" id="reviews">
@@ -189,7 +195,9 @@ const ReviewsSection = () => {
             minLength={10}
           />
           
-          <button type="submit">Submit Review</button>
+          <button type="submit" disabled={loading}>
+            {loading ? 'Submitting...' : 'Submit Review'}
+          </button>
         </form>
       </div>
 
@@ -206,7 +214,7 @@ const ReviewsSection = () => {
                 <span className="reviewer-name">{review.name}</span>
                 <span className="review-rating">{generateStars(review.rating)}</span>
               </div>
-              <span className="review-date">{review.date}</span>
+              <span className="review-date">{new Date(review.created_at).toLocaleDateString()}</span>
             </div>
             <div className="review-comment">{review.comment}</div>
             <div className="review-actions">

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-const AskQuestionForm = ({ onSubmit }) => {
+const AskQuestionForm = ({ onSubmit, loading }) => {
   const [name, setName] = useState('')
   const [question, setQuestion] = useState('')
 
@@ -40,8 +40,8 @@ const AskQuestionForm = ({ onSubmit }) => {
           className="form-textarea"
           rows="4"
         />
-        <button type="submit" className="submit-btn">
-          Ask Question
+        <button type="submit" className="submit-btn" disabled={loading}>
+          {loading ? 'Submitting...' : 'Ask Question'}
         </button>
       </form>
     </div>
